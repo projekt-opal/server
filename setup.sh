@@ -5,31 +5,33 @@
 # Installs:
 # - docker-ce (and its prerequisites, according to https://docs.docker.com/install/linux/docker-ce/ubuntu as of 29.10.2018)
 # - docker-compose
-# - python (version 3, for basic http server)
 
-apt-get update
+# 1. download and install docker
 
-apt-get install apt-transport-https \
-    ca-certificates \
-    curl \
-    software-properties-common
+curl -fsSL https://get.docker.com -o get-docker.sh
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+sudo sh get-docker.sh
 
-apt-key fingerprint 0EBFCD88
+# 2. add opaladmin to docker group
 
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
+sudo usermod -aG docker opaladmin
 
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
+# 3. run docker on startup
 
-apt-get update
+sudo systemctl enable docker
 
-apt-get install docker-ce
+# 4. install docker-compose - NOTE: this command might be outdated, check for newer version
 
-docker run hello-world
+sudo curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 5. make docker-compose executable
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+# 6. add compose bash completion
+
+sudo curl -L https://raw.githubusercontent.com/docker/compose/1.22.0/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+
+# 7. test installation
+echo "\nIf the installation was successful, the following test command should print the docker-compose version:"
+docker-compose --version
